@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -eu
+
+# Requirements:
+#
+# jq
+# curl
+# gum
+
+version='0.0.1'
+me="${0##*/}"
+
+run_curl() {
+	set -- -s -H "User-Agent: ${me}/${version}" "$@"
+	curl "$@"
+}
+
+heading() {
+	gum style --foreground=2 --underline=true "$@"
+}
+
+report='"{{ Color \"4\" \"IP address:\" }} \(.ip)",
+        "{{ Color \"4\" \"Country:\" }} \(.country)",
+        "{{ Color \"4\" \"Region:\" }} \(.region_name)",
+        "{{ Color \"4\" \"City:\" }} \(.city)",
+        "{{ Color \"4\" \"ASN organization:\" }} \(.asn_org)",
+        "{{ Color \"4\" \"Hostname:\" }} \(.hostname)"'
+
+heading 'Using HTTP'
+run_curl 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
+
+echo
+heading 'Using HTTPS'
+run_curl 'https://ifconfig.co/json' | jq -r "$report" | gum format -t template
