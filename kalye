@@ -29,7 +29,9 @@ report='"{{ Color \"4\" \"IP address:\" }} \(.ip)",
 
 heading 'Using HTTP'
 run_curl 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
+echo
 
 echo
 heading 'Using HTTPS'
 run_curl 'https://ifconfig.co/json' | jq -r "$report" | gum format -t template
+echo
