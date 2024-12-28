@@ -17,6 +17,8 @@ run_curl() {
 }
 
 heading() {
+	test "${heading_first_line:-1}" -eq 0 && echo || heading_first_line=0
+
 	gum style --foreground=2 --underline=true "$@"
 }
 
@@ -27,11 +29,31 @@ report='"{{ Color \"4\" \"IP address:\" }} \(.ip)",
         "{{ Color \"4\" \"ASN organization:\" }} \(.asn_org)",
         "{{ Color \"4\" \"Hostname:\" }} \(.hostname)"'
 
-heading 'Using HTTP'
-run_curl 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
-echo
+have_ipv4=0
+have_ipv6=0
+run_curl https://api.ipify.org/  >/dev/null && have_ipv4=1
+run_curl https://api6.ipify.org/ >/dev/null && have_ipv6=1
 
-echo
-heading 'Using HTTPS'
-run_curl 'https://ifconfig.co/json' | jq -r "$report" | gum format -t template
-echo
+if [ $have_ipv4 -eq 1 ]; then
+	heading 'Using HTTP (ipv4)'
+	run_curl -4 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
+	echo
+fi
+
+if [ $have_ipv6 -eq 1 ]; then
+	heading 'Using HTTP (ipv6)'
+	run_curl -6 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
+	echo
+fi
+
+if [ $have_ipv4 -eq 1 ]; then
+	heading 'Using HTTPS (ipv4)'
+	run_curl -4 'https://ifconfig.co/json' | jq -r "$report" | gum format -t template
+	echo
+fi
+
+if [ $have_ipv6 -eq 1 ]; then
+	heading 'Using HTTPS (ipv6)'
+	run_curl -6 'https://ifconfig.co/json' | jq -r "$report" | gum format -t template
+	echo
+fi
