@@ -34,6 +34,11 @@ have_ipv6=0
 run_curl https://api.ipify.org/  >/dev/null && have_ipv4=1
 run_curl https://api6.ipify.org/ >/dev/null && have_ipv6=1
 
+if [ $have_ipv4 -eq 0 ] && [ $have_ipv6 -eq 0 ]; then
+	gum log -l fatal 'No connectivity over ipv4 or ipv6'
+	exit 1
+fi
+
 if [ $have_ipv4 -eq 1 ]; then
 	heading 'Using HTTP (ipv4)'
 	run_curl -4 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
