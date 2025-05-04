@@ -40,6 +40,20 @@ if [ $have_ipv4 -eq 0 ] && [ $have_ipv6 -eq 0 ]; then
 fi
 
 if [ $have_ipv4 -eq 1 ]; then
+	echo '{{ Color "2" "✔" }} IPv4' | gum format -t template ; echo
+else
+	echo '{{ Color "1" "✘" }} IPv4' | gum format -t template ; echo
+fi
+
+if [ $have_ipv6 -eq 1 ]; then
+	echo '{{ Color "2" "✔" }} IPv6' | gum format -t template ; echo
+else
+	echo '{{ Color "1" "✘" }} IPv6' | gum format -t template ; echo
+fi
+
+echo
+
+if [ $have_ipv4 -eq 1 ]; then
 	heading 'Using HTTP (IPv4)'
 	run_curl -4 'http://ifconfig.co/json' | jq -r "$report" | gum format -t template
 	echo
